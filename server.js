@@ -9,19 +9,22 @@ const server = net.createServer((socket) => {
 server.on("connection", (socket) => {
   console.log("SERVER: A new connection was established.");
 
-  // clients.forEach((s) => {
-  //   s.on("data", (data) => {
-  //     s.write(data);
-  //   });
-  // });
+  const clientId = clients.length + 1;
+
+  console.log(`Client ${clientId} connected`);
+  socket.write(`Id-${clientId}`);
+
+  clients.forEach((client) => {
+    client.socket.write(`New client with id ${clientId} was connected`);
+  });
 
   socket.on("data", (data) => {
-    clients.forEach((s) => {
-      s.write(data);
+    clients.forEach((client) => {
+      client.socket.write(`${data}`);
     });
   });
 
-  clients.push(socket);
+  clients.push({ id: clientId, socket });
 
   socket.on("error", (err) => {
     console.log("SERVER - ERROR: ", err.message);
